@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const entity_1 = require("../users/entity");
-const emptyRow = [null, null, null];
-const emptyBoard = [emptyRow, emptyRow, emptyRow];
+const emptyRow = [null, null, null, null, null];
+const emptyBoard = [emptyRow, emptyRow, [null, null, 'x', null, null], emptyRow, emptyRow];
 let Game = class Game extends typeorm_1.BaseEntity {
 };
 __decorate([
@@ -24,9 +24,9 @@ __decorate([
     __metadata("design:type", Array)
 ], Game.prototype, "board", void 0);
 __decorate([
-    typeorm_1.Column('char', { length: 1, default: 'x' }),
-    __metadata("design:type", String)
-], Game.prototype, "turn", void 0);
+    typeorm_1.Column('char', { length: 1, default: 0 }),
+    __metadata("design:type", Number)
+], Game.prototype, "userMoving", void 0);
 __decorate([
     typeorm_1.Column('char', { length: 1, nullable: true }),
     __metadata("design:type", String)
@@ -35,6 +35,38 @@ __decorate([
     typeorm_1.Column('text', { default: 'pending' }),
     __metadata("design:type", String)
 ], Game.prototype, "status", void 0);
+__decorate([
+    typeorm_1.Column('int', { default: 0 }),
+    __metadata("design:type", Number)
+], Game.prototype, "played1", void 0);
+__decorate([
+    typeorm_1.Column('int', { default: 0 }),
+    __metadata("design:type", Number)
+], Game.prototype, "played2", void 0);
+__decorate([
+    typeorm_1.Column('char', { length: 3, default: '---' }),
+    __metadata("design:type", String)
+], Game.prototype, "clickedCell1", void 0);
+__decorate([
+    typeorm_1.Column('char', { length: 3, default: '---' }),
+    __metadata("design:type", String)
+], Game.prototype, "clickedCell2", void 0);
+__decorate([
+    typeorm_1.Column('integer', { default: 0 }),
+    __metadata("design:type", Number)
+], Game.prototype, "points1", void 0);
+__decorate([
+    typeorm_1.Column('integer', { default: 0 }),
+    __metadata("design:type", Number)
+], Game.prototype, "points2", void 0);
+__decorate([
+    typeorm_1.Column('integer', { default: 0 }),
+    __metadata("design:type", Number)
+], Game.prototype, "nX", void 0);
+__decorate([
+    typeorm_1.Column('integer', { default: 0 }),
+    __metadata("design:type", Number)
+], Game.prototype, "nY", void 0);
 __decorate([
     typeorm_1.OneToMany(_ => Player, player => player.game, { eager: true }),
     __metadata("design:type", Array)
@@ -61,10 +93,6 @@ __decorate([
     typeorm_1.Column('char', { length: 1 }),
     __metadata("design:type", String)
 ], Player.prototype, "symbol", void 0);
-__decorate([
-    typeorm_1.Column('integer', { name: 'user_id' }),
-    __metadata("design:type", Number)
-], Player.prototype, "userId", void 0);
 Player = __decorate([
     typeorm_1.Entity(),
     typeorm_1.Index(['game', 'user', 'symbol'], { unique: true })

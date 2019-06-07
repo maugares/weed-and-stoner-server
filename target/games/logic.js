@@ -10,8 +10,8 @@ const class_validator_1 = require("class-validator");
 let IsBoard = class IsBoard {
     validate(board) {
         const symbols = ['x', 'o', null];
-        return board.length === 3 &&
-            board.every(row => row.length === 3 &&
+        return board.length === 9 &&
+            board.every(row => row.length === 9 &&
                 row.every(symbol => symbols.includes(symbol)));
     }
 };

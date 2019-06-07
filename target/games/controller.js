@@ -15,17 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const routing_controllers_1 = require("routing-controllers");
 const entity_1 = require("../users/entity");
 const entities_1 = require("./entities");
-const logic_1 = require("./logic");
-const class_validator_1 = require("class-validator");
 const index_1 = require("../index");
-class GameUpdate {
-}
-__decorate([
-    class_validator_1.Validate(logic_1.IsBoard, {
-        message: 'Not a valid board'
-    }),
-    __metadata("design:type", Array)
-], GameUpdate.prototype, "board", void 0);
 let GameController = class GameController {
     async createGame(user) {
         const entity = await entities_1.Game.create().save();
@@ -64,28 +54,57 @@ let GameController = class GameController {
         const game = await entities_1.Game.findOneById(gameId);
         if (!game)
             throw new routing_controllers_1.NotFoundError(`Game does not exist`);
-        const player = await entities_1.Player.findOne({ user, game });
-        if (!player)
-            throw new routing_controllers_1.ForbiddenError(`You are not part of this game`);
-        if (game.status !== 'started')
-            throw new routing_controllers_1.BadRequestError(`The game is not started yet`);
-        if (player.symbol !== game.turn)
-            throw new routing_controllers_1.BadRequestError(`It's not your turn`);
-        if (!logic_1.isValidTransition(player.symbol, game.board, update.board)) {
-            throw new routing_controllers_1.BadRequestError(`Invalid move`);
+        const updateBoard = update.game;
+        const { clickedCell } = updateBoard;
+        if (user.id === 1) {
+            game.clickedCell1 = clickedCell;
+            game.played1 = 1;
         }
-        const winner = logic_1.calculateWinner(update.board);
-        if (winner) {
-            game.winner = winner;
-            game.status = 'finished';
+        else if (user.id === 2) {
+            game.clickedCell2 = clickedCell;
+            game.played2 = 1;
         }
-        else if (logic_1.finished(update.board)) {
-            game.status = 'finished';
+        await game.save();
+        const countSymbol = (board, symbol) => {
+            const arrX = [];
+            for (let row = 0; row < board.length; row++) {
+                for (let cell = 0; cell < board[row].length; cell++) {
+                    if (board[row][cell] === symbol) {
+                        arrX.push([row, cell]);
+                    }
+                }
+            }
+            return arrX.length;
+        };
+        const nX = countSymbol(game.board, 'x');
+        const nO = countSymbol(game.board, 'o');
+        console.log('\n\nnumber of X:\n\n', nX);
+        console.log('\n\nnumber of Y:\n\n', nO);
+        const b1 = game.clickedCell1;
+        const b2 = game.clickedCell2;
+        const b1b2Same = b1 === b2;
+        const allPlayed = game.played1 && game.played2;
+        function markCell(clickedCell, symbol) {
+            const [rowIndex, columnIndex] = clickedCell.split('-');
+            if (game)
+                game.board[rowIndex][columnIndex] = symbol;
         }
-        else {
-            game.turn = player.symbol === 'x' ? 'o' : 'x';
+        if (!b1b2Same && allPlayed) {
+            markCell(game.clickedCell1, 'x');
+            game.clickedCell1 = '---';
+            game.clickedCell2 = '---';
+            game.played1 = 0;
+            game.played2 = 0;
+            game.points1 += 100;
         }
-        game.board = update.board;
+        else if (b1b2Same && allPlayed) {
+            markCell(game.clickedCell2, 'o');
+            game.clickedCell1 = '---';
+            game.clickedCell2 = '---';
+            game.played1 = 0;
+            game.played2 = 0;
+            game.points2 += 300;
+        }
         await game.save();
         index_1.io.emit('action', {
             type: 'UPDATE_GAME',
@@ -126,7 +145,7 @@ __decorate([
     __param(1, routing_controllers_1.Param('id')),
     __param(2, routing_controllers_1.Body()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [entity_1.default, Number, GameUpdate]),
+    __metadata("design:paramtypes", [entity_1.default, Number, Object]),
     __metadata("design:returntype", Promise)
 ], GameController.prototype, "updateGame", null);
 __decorate([
@@ -148,4 +167,30 @@ GameController = __decorate([
     routing_controllers_1.JsonController()
 ], GameController);
 exports.default = GameController;
+const symbolArray = (obj, size) => {
+    const { arrX, arrXs } = obj;
+    const posRaw = [];
+    for (let i = 0; i < arrX.length; i++) {
+        let row = arrX[i][0];
+        let col = arrX[i][1];
+        const arr = [
+            row - 1 > -1 ? posRaw.push(`${[row - 1, col]}`) : null,
+            row + 1 < (size + 1) ? posRaw.push(`${[row + 1, col]}`) : null,
+            col - 1 > -1 ? posRaw.push(`${[row, col - 1]}`) : null,
+            col + 1 < (size + 1) ? posRaw.push(`${[row, col + 1]}`) : null
+        ];
+    }
+    const unique = [...new Set(posRaw)]
+        .map(u => {
+        if (arrXs.includes(`[${u}]`)) {
+            return null;
+        }
+        else {
+            const split = u.split(",");
+            return [parseInt(split[0]), parseInt(split[1])];
+        }
+    })
+        .filter(u => u != null);
+    return [unique];
+};
 //# sourceMappingURL=controller.js.map
