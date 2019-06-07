@@ -93,6 +93,10 @@ __decorate([
     typeorm_1.Column('char', { length: 1 }),
     __metadata("design:type", String)
 ], Player.prototype, "symbol", void 0);
+__decorate([
+    typeorm_1.Column('integer', { name: 'user_id' }),
+    __metadata("design:type", Number)
+], Player.prototype, "userId", void 0);
 Player = __decorate([
     typeorm_1.Entity(),
     typeorm_1.Index(['game', 'user', 'symbol'], { unique: true })
