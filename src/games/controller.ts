@@ -1,10 +1,9 @@
 import {
-  JsonController, Authorized, CurrentUser, Post, Param, BadRequestError, HttpCode, NotFoundError, ForbiddenError, Get,
+  JsonController, Authorized, CurrentUser, Post, Param, BadRequestError, HttpCode, NotFoundError, Get,
   Body, Patch
 } from 'routing-controllers'
 import User from '../users/entity'
 import { Game, Player } from './entities'
-import { calculateWinner, finished } from './logic'
 import { io } from '../index'
 
 @JsonController()
@@ -95,9 +94,9 @@ export default class GameController {
     await game.save()
 
     const countSymbol = (board, symbol) => {
-      const arrX = []
-      for (let row = 0; row < board.length; row++) {
-        for (let cell = 0; cell < board[row].length; cell++) {
+      const arrX: number[][] = [] 
+      for (let row: number = 0; row < board.length; row++) {
+        for (let cell: number = 0; cell < board[row].length; cell++) {
           if (board[row][cell] === symbol) {
             arrX.push([row, cell])
           }
@@ -163,30 +162,30 @@ export default class GameController {
   }
 }
 
-const symbolArray = (obj, size) => {
-  const { arrX, arrXs } = obj
-  const posRaw = []
-  for (let i = 0; i < arrX.length; i++) {
-    let row = arrX[i][0]
-    let col = arrX[i][1]
+// const symbolArray = (obj, size) => {
+//   const { arrX, arrXs } = obj
+//   const posRaw = []
+//   for (let i = 0; i < arrX.length; i++) {
+//     let row = arrX[i][0]
+//     let col = arrX[i][1]
 
-    const arr = [
-      row - 1 > -1 ? posRaw.push(`${[row - 1, col]}`) : null,
-      row + 1 < (size + 1) ? posRaw.push(`${[row + 1, col]}`) : null,
-      col - 1 > - 1 ? posRaw.push(`${[row, col - 1]}`) : null,
-      col + 1 < (size + 1) ? posRaw.push(`${[row, col + 1]}`) : null
-    ]
-  }
+//     const arr = [
+//       row - 1 > -1 ? posRaw.push(`${[row - 1, col]}`) : null,
+//       row + 1 < (size + 1) ? posRaw.push(`${[row + 1, col]}`) : null,
+//       col - 1 > - 1 ? posRaw.push(`${[row, col - 1]}`) : null,
+//       col + 1 < (size + 1) ? posRaw.push(`${[row, col + 1]}`) : null
+//     ]
+//   }
 
-  const unique = [...new Set(posRaw)]
-    .map(u => {
-      if (arrXs.includes(`[${u}]`)) {
-        return null
-      } else {
-        const split = u.split(",")
-        return [parseInt(split[0]), parseInt(split[1])]
-      }
-    })
-    .filter(u => u != null)
-  return [unique]
-}
+//   const unique = [...new Set(posRaw)]
+//     .map(u => {
+//       if (arrXs.includes(`[${u}]`)) {
+//         return null
+//       } else {
+//         const split = u.split(",")
+//         return [parseInt(split[0]), parseInt(split[1])]
+//       }
+//     })
+//     .filter(u => u != null)
+//   return [unique]
+// }

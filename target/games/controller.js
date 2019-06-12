@@ -167,30 +167,4 @@ GameController = __decorate([
     routing_controllers_1.JsonController()
 ], GameController);
 exports.default = GameController;
-const symbolArray = (obj, size) => {
-    const { arrX, arrXs } = obj;
-    const posRaw = [];
-    for (let i = 0; i < arrX.length; i++) {
-        let row = arrX[i][0];
-        let col = arrX[i][1];
-        const arr = [
-            row - 1 > -1 ? posRaw.push(`${[row - 1, col]}`) : null,
-            row + 1 < (size + 1) ? posRaw.push(`${[row + 1, col]}`) : null,
-            col - 1 > -1 ? posRaw.push(`${[row, col - 1]}`) : null,
-            col + 1 < (size + 1) ? posRaw.push(`${[row, col + 1]}`) : null
-        ];
-    }
-    const unique = [...new Set(posRaw)]
-        .map(u => {
-        if (arrXs.includes(`[${u}]`)) {
-            return null;
-        }
-        else {
-            const split = u.split(",");
-            return [parseInt(split[0]), parseInt(split[1])];
-        }
-    })
-        .filter(u => u != null);
-    return [unique];
-};
 //# sourceMappingURL=controller.js.map
