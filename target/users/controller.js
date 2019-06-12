@@ -59,7 +59,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "getUser", null);
 __decorate([
-    routing_controllers_1.Authorized(),
     routing_controllers_1.Get('/users'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
